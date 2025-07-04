@@ -1,3 +1,5 @@
+:: Zodra dit niet lijkt te werken, ga dan in debug mode en als het dar wel werkt
+:: dan met de GUI compileren
 @echo off
 setlocal
 

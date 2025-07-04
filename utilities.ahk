@@ -3,7 +3,6 @@ OnlyRun(exeName, appPath, appName := "") {
     if (appName = "")
         appName := StrReplace(exeName, ".exe", "")
 
-    MsgBox(appPath)
     if (appPath != "")
         Run(appPath)
     Else
@@ -53,8 +52,8 @@ FindAppPath(appName) {
         expandedPath := ExpandEnvVars(basePath)
         fullPath := expandedPath . "\" . subPath
 
+        ; MsgBox(expandedPath)
         if FileExist(fullPath) {
-            MsgBox("exists fulpath" . fullPath)
             return fullPath
         }
 

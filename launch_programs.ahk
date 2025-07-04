@@ -4,7 +4,7 @@
 
 ; Initialize application paths at startup
 VSCodeExePath := FindAppPath("VSCode")
-ChromeExePath := FindAppPath("Chrome")
+EverythingExePath := FindAppPath("Everything")
 FirefoxExePath := FindAppPath("Firefox")
 WordExePath := FindAppPath("Word")
 LaunchyExePath := FindAppPath("Launchy")
@@ -14,6 +14,8 @@ TeamsExePath := FindAppPath("Teams")
 
 ; Hotkeys using ActivateOrRun function
 #Esc::OnlyRun("launchy.exe", LaunchyExePath, "Launchy")
+
+#e::ActivateOrRun("Everything.exe", EverythingExePath, "Everything")
 
 #v::ActivateOrRun("Code.exe", VSCodeExePath, "VS Code")
 
