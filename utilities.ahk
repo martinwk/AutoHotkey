@@ -33,7 +33,8 @@ ExpandEnvVars(path) {
 }
 
 FindAppPath(appName) {
-    iniFile := A_ScriptDir . "\paths.ini"
+    iniFile := A_AppData . "\ahk\paths.ini"
+    MsgBox("ini File:" . iniFile)
 
     ; Haal de subfolder/executable op voor de applicatie
     subPath := IniRead(iniFile, "Applications", appName, "")
