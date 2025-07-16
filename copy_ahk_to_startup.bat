@@ -73,6 +73,24 @@ if exist "%CURRENT_DIR%*.ahk" (
     exit /b 1
 )
 
+
+REM Copy lib-folder (recursively) to startup folder
+if exist "%CURRENT_DIR%lib" (
+    echo Copying lib folder to startup folder...
+    xcopy "%CURRENT_DIR%lib" "%STARTUP_FOLDER%\lib" /E /I /Y >nul
+    if errorlevel 1 (
+        echo ERROR: Failed to copy lib folder to startup folder
+        pause
+        exit /b 1
+    ) else (
+        echo Successfully copied lib folder to startup folder.
+    )
+) else (
+    echo ERROR: lib folder not found in current directory
+    pause
+    exit /b 1
+)
+
 echo.
 echo ========================================
 echo   Deployment completed successfully!

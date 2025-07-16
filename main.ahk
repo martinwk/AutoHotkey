@@ -4,6 +4,5 @@
 ;   https://github.com/xypha/AHK-v2-scripts/blob/main/Showcase.ahk
 
 ; include helper functions
-#Include utilities.ahk
-; include
-#Include launch_programs.ahk
+#Include lib\utilities.ahk
+#Include lib\launch_programs.ahk

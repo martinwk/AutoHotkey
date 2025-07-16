@@ -34,11 +34,11 @@ ExpandEnvVars(path) {
 
 FindAppPath(appName) {
     iniFile := A_AppData . "\ahk\paths.ini"
-    MsgBox("ini File:" . iniFile)
 
     ; Haal de subfolder/executable op voor de applicatie
     subPath := IniRead(iniFile, "Applications", appName, "")
     if (subPath = "")
+        ; MsgBox("ini File:" . subPath)
         return ""
 
     ; Probeer eerst CommonPaths
@@ -76,4 +76,15 @@ FindAppPath(appName) {
     }
 
     return ""
+}
+
+CloseAllWindows() {
+    for hwnd in WinGetList() {
+        title := WinGetTitle(hwnd)
+        exe := WinGetProcessName(hwnd)
+        ; Skip empty titles, Program Manager, and VSCode (Code.exe)
+        if (title = "" || title = "Program Manager" || exe = "Code.exe")
+            continue
+        try WinClose(hwnd)
+    }
 }
