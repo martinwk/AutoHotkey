@@ -6,3 +6,4 @@
 ; include helper functions
 #Include lib\utilities.ahk
 #Include lib\launch_programs.ahk
+#Include lib\outlook_hotkeys.ahk
