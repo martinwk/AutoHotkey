@@ -3,14 +3,23 @@
 #Include utilities.ahk
 
 ; Initialize application paths at startup
-VSCodeExePath := FindAppPath("VSCode")
-EverythingExePath := FindAppPath("Everything")
-FirefoxExePath := FindAppPath("Firefox")
-WordExePath := FindAppPath("Word")
-LaunchyExePath := FindAppPath("Launchy")
-ZoteroExePath := FindAppPath("Zotero")
-NotionExePath := FindAppPath("Notion")
-TeamsExePath := FindAppPath("Teams")
+; List of all exe's used in hotkeys
+exeList := [
+    "Code.exe",
+    "Everything.exe",
+    "firefox.exe",
+    "WINWORD.EXE",
+    "launchy.exe",
+    "zotero.exe",
+    "Notion.exe",
+    "ms-teams.exe",
+    "Spotify.exe"
+]
+
+; Find locations for all exe's
+locations := FindExeLocations(exeList)
+; for exe, path in locations
+;     MsgBox(exe ": " path)
 
 ; hotkey to sleep windows
 #q::
@@ -48,18 +57,20 @@ TeamsExePath := FindAppPath("Teams")
 ; Hotkeys using ActivateOrRun function or OnlyRun function if you do not want to activate
 ; (sometimes that does not work)
 
-#Esc::OnlyRun("launchy.exe", LaunchyExePath, "Launchy")
+#Esc::OnlyRun("launchy.exe", locations, "Launchy")
 
-#e::ActivateOrRun("Everything.exe", EverythingExePath, "Everything")
+#e::ActivateOrRun("Everything.exe", locations, "Everything")
 
-#v::ActivateOrRun("Code.exe", VSCodeExePath, "VS Code")
+#v::ActivateOrRun("Code.exe", locations, "VS Code")
 
-#f::ActivateOrRun("firefox.exe", FirefoxExePath, "Firefox")
+#f::ActivateOrRun("firefox.exe", locations, "Firefox")
 
-#w::ActivateOrRun("WINWORD.EXE", WordExePath, "Word")
+#w::ActivateOrRun("WINWORD.EXE", locations, "Word")
 
-#z::ActivateOrRun("zotero.exe", ZoteroExePath, "Zotero")
+#z::ActivateOrRun("zotero.exe", locations, "Zotero")
 
-#n::ActivateOrRun("Notion.exe", NotionExePath, "Notion")
+#n::ActivateOrRun("Notion.exe", locations, "Notion")
 
-#t::ActivateOrRun("ms-teams.exe", TeamsExePath, "Teams")
+#t::ActivateOrRun("ms-teams.exe", locations, "Teams")
+
+#s::ActivateOrRun("Spotify.exe", locations, "Spotify")
