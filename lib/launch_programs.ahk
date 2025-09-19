@@ -8,12 +8,13 @@ exeList := [
     "Code.exe",
     "Everything.exe",
     "firefox.exe",
-    "WINWORD.EXE",
     "launchy.exe",
-    "zotero.exe",
-    "Notion.exe",
     "ms-teams.exe",
-    "Spotify.exe"
+    "Notion.exe",
+    "POWERPNT.EXE",
+    "Spotify.exe",
+    "WINWORD.EXE",
+    "zotero.exe"
 ]
 
 ; Find locations for all exe's
@@ -61,16 +62,18 @@ locations := FindExeLocations(exeList)
 
 #e::ActivateOrRun("Everything.exe", locations, "Everything")
 
-#v::ActivateOrRun("Code.exe", locations, "VS Code")
-
 #f::ActivateOrRun("firefox.exe", locations, "Firefox")
+
+#n::ActivateOrRun("Notion.exe", locations, "Notion")
+
+#p::ActivateOrRun("POWERPNT.EXE", locations, "Powerpoint")
+
+#s::ActivateOrRun("Spotify.exe", locations, "Spotify")
+
+#t::ActivateOrRun("ms-teams.exe", locations, "Teams")
+
+#v::ActivateOrRun("Code.exe", locations, "VS Code")
 
 #w::ActivateOrRun("WINWORD.EXE", locations, "Word")
 
 #z::ActivateOrRun("zotero.exe", locations, "Zotero")
-
-#n::ActivateOrRun("Notion.exe", locations, "Notion")
-
-#t::ActivateOrRun("ms-teams.exe", locations, "Teams")
-
-#s::ActivateOrRun("Spotify.exe", locations, "Spotify")
