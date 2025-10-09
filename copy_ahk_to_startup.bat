@@ -74,16 +74,16 @@ if exist "%CURRENT_DIR%*.ahk" (
 )
 
 
-REM Copy lib-folder (recursively) to startup folder
+REM Copy lib-folder (recursively) to %APPDATA%\ahk\lib
 if exist "%CURRENT_DIR%lib" (
-    echo Copying lib folder to startup folder...
-    xcopy "%CURRENT_DIR%lib" "%STARTUP_FOLDER%\lib" /E /I /Y >nul
+    echo Copying lib folder to %APPDATA_AHK%\lib...
+    xcopy "%CURRENT_DIR%lib" "%APPDATA_AHK%\lib" /E /I /Y >nul
     if errorlevel 1 (
-        echo ERROR: Failed to copy lib folder to startup folder
+        echo ERROR: Failed to copy lib folder to %APPDATA_AHK%\lib
         pause
         exit /b 1
     ) else (
-        echo Successfully copied lib folder to startup folder.
+        echo Successfully copied lib folder to %APPDATA_AHK%\lib.
     )
 ) else (
     echo ERROR: lib folder not found in current directory
@@ -99,6 +99,7 @@ echo.
 echo Files deployed:
 echo - INI files copied to: %APPDATA_AHK%
 echo - *.ahk copied to: %STARTUP_FOLDER%
+echo - lib folder copied to: %APPDATA_AHK%\lib
 echo.
 echo Your AutoHotkey script will now run automatically at startup.
 echo.

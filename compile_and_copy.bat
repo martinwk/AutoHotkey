@@ -18,7 +18,13 @@ taskkill /im %EXE_NAME%
 :: Stap 4: Kopieer naar de Windows Startup folder
 set "STARTUP_FOLDER=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 copy /Y "%SCRIPT_DIR%%EXE_NAME%" "%STARTUP_FOLDER%\"
-copy /Y "%SCRIPT_DIR%*.ini" "%STARTUP_FOLDER%\"
+
+:: Kopieer ini-bestanden en lib naar %APPDATA%\ahk
+set "APPDATA_AHK=%APPDATA%\ahk"
+if not exist "%APPDATA_AHK%" mkdir "%APPDATA_AHK%"
+if not exist "%APPDATA_AHK%\lib" mkdir "%APPDATA_AHK%\lib"
+copy /Y "%SCRIPT_DIR%*.ini" "%APPDATA_AHK%\" >nul
+xcopy "%SCRIPT_DIR%lib" "%APPDATA_AHK%\lib" /E /I /Y >nul
 @REM FOR %%I in (%SCRIPT_DIR%*.ini) DO COPY /Y "%%I" "%STARTUP_FOLDER%\"
 
 echo Script is gecompileerd en toegevoegd aan de Startup folder.
