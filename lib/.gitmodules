@@ -1,0 +1,3 @@
+[submodule "BluetoothDeviceConnector"]
+	path = BluetoothDeviceConnector
+	url = https://github.com/hervehobbes/BluetoothDeviceConnector.git
