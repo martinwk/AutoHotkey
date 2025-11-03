@@ -91,6 +91,57 @@ if exist "%CURRENT_DIR%lib" (
     exit /b 1
 )
 
+:: Create a shortcut to the BluetoothDeviceConnector script in the AppData lib folder
+set "BT_FOLDER=%APPDATA_AHK%\lib\BluetoothDeviceConnector"
+if not exist "%BT_FOLDER%" (
+    echo BluetoothDeviceConnector folder not found at %BT_FOLDER% - creating it...
+    mkdir "%BT_FOLDER%"
+)
+
+:: Try to find AutoHotkey executable (search common ProgramFiles locations)
+set "AHK_EXE="
+for %%D in ("%ProgramFiles%" "%ProgramFiles(x86)%") do (
+    set "candidate=%%~D\AutoHotkey\v2\AutoHotkey.exe"
+    if exist "!candidate!" (
+        if "!AHK_EXE!"=="" set "AHK_EXE=!candidate!"
+    )
+)
+
+if "%AHK_EXE%"=="" (
+    echo WARNING: AutoHotkey executable not found in Program Files. Shortcut will not be created.
+) else (
+    echo Creating shortcut for BluetoothDeviceConnector in %BT_FOLDER%...
+    powershell -NoProfile -Command "$W=New-Object -ComObject WScript.Shell; $s=$W.CreateShortcut('%BT_FOLDER%\\BluetoothDeviceConnector.lnk'); $s.TargetPath='%AHK_EXE%'; $s.Arguments='"%APPDATA_AHK%\\lib\\BluetoothDeviceConnector\\bluetooth_device_connector.ahk"'; $s.WorkingDirectory='%BT_FOLDER%'; $s.Save()"
+    if errorlevel 1 (
+        echo ERROR: Failed to create shortcut.
+    ) else (
+        echo Shortcut created: %BT_FOLDER%\BluetoothDeviceConnector.lnk
+    )
+)
+
+:: Also copy the shortcut to the user's Desktop and to this repository folder
+set "SHORTCUT=%BT_FOLDER%\BluetoothDeviceConnector.lnk"
+if exist "%SHORTCUT%" (
+    set "DESKTOP=%USERPROFILE%\Desktop"
+    echo Copying shortcut to Desktop: %DESKTOP%
+    copy /Y "%SHORTCUT%" "%DESKTOP%\" >nul
+    if errorlevel 1 (
+        echo WARNING: Failed to copy shortcut to Desktop (%DESKTOP%)
+    ) else (
+        echo Shortcut copied to Desktop.
+    )
+
+    echo Copying shortcut to repo folder: %CURRENT_DIR%
+    copy /Y "%SHORTCUT%" "%CURRENT_DIR%" >nul
+    if errorlevel 1 (
+        echo WARNING: Failed to copy shortcut to repo folder (%CURRENT_DIR%)
+    ) else (
+        echo Shortcut copied to repo folder.
+    )
+) else (
+    echo No shortcut found to copy to Desktop or repo folder.
+)
+
 echo.
 echo ========================================
 echo   Deployment completed successfully!
