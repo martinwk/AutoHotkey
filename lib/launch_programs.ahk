@@ -22,6 +22,7 @@ locations := FindExeLocations(exeList)
 ; for exe, path in locations
 ;     MsgBox(exe ": " path)
 
+
 ; hotkey to sleep windows
 #q::
 {
@@ -77,3 +78,6 @@ locations := FindExeLocations(exeList)
 #w::ActivateOrRun("WINWORD.EXE", locations, "Word")
 
 #z::ActivateOrRun("zotero.exe", locations, "Zotero")
+
+; Remap Windows + Print Screen to trigger Windows + Shift + S
+#PrintScreen:: Send("#+s")
