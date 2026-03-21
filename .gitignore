@@ -1,3 +1,4 @@
 *.exe
 .vscode/launch.json
 *.lnk
+.vscode/settings.json
