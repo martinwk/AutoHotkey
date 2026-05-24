@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
-GetCurrentYearWeek() {
-    return FormatTime(A_Now, "yyyy") "-" Format("{:02}", (A_YDay - 1) // 7 + 1)
+GetCurrentYearMonth() {
+    return FormatTime(A_Now, "yyyy-MM")
 }
 
 debug := true
@@ -30,8 +30,8 @@ GetOutlookPreviewSubject() {
     return ""
 }
 
-global lastWindow := "", lastStartTime := A_Now, lastWeek := GetCurrentYearWeek()
-global logFile := A_Desktop "\window_log_" lastWeek ".txt"
+global lastWindow := "", lastStartTime := A_Now, lastMonth := GetCurrentYearMonth()
+global logFile := A_Desktop "\window_log_" lastMonth ".txt"
 
 CheckWindow() {
     global lastWindow, lastStartTime, logFile, lastWeek
@@ -56,10 +56,10 @@ CheckWindow() {
             endTime := A_Now
             duration := DateDiff(endTime, lastStartTime, "Seconds")
             durationMin := duration // 60
-            currentWeek := GetCurrentYearWeek()
-            if (currentWeek != lastWeek) {
-                logFile := A_Desktop "\window_log_" currentWeek ".txt"
-                lastWeek := currentWeek
+            currentMonth := GetCurrentYearMonth()
+            if (currentMonth != lastMonth) {
+                logFile := A_Desktop "\window_log_" currentMonth ".txt"
+                lastMonth := currentMonth
             }
             FileAppend(Format("{1} - {2} | {3:03} min | {4}`n", FormatTime(lastStartTime, "yyyy-MM-dd HH:mm:ss"), FormatTime(endTime, "yyyy-MM-dd HH:mm:ss"), durationMin, lastWindow), logFile, "UTF-8")
         }
