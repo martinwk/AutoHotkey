@@ -34,7 +34,7 @@ global lastWindow := "", lastStartTime := A_Now, lastMonth := GetCurrentYearMont
 global logFile := A_Desktop "\window_log_" lastMonth ".txt"
 
 CheckWindow() {
-    global lastWindow, lastStartTime, logFile, lastWeek
+    global lastWindow, lastStartTime, logFile, lastMonth
     idleMs := A_TimeIdlePhysical
     try {
         current := WinGetTitle("A")
