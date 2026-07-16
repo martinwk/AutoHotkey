@@ -165,7 +165,9 @@ global logFile := A_Desktop "\window_log_" lastMonth ".txt"
 CurrentLogFile() {
     global logFile, lastMonth
     currentMonth := GetCurrentYearMonth()
-    if (currentMonth != lastMonth) {
+    ; IsSet: the mark hotkey can fire while the auto-execute section (which assigns
+    ; the globals) is still busy in an earlier #Include of main.ahk
+    if (!IsSet(lastMonth) || currentMonth != lastMonth) {
         logFile := A_Desktop "\window_log_" currentMonth ".txt"
         lastMonth := currentMonth
     }
@@ -259,9 +261,9 @@ SessionChanged(wParam, lParam, msg, hwnd) {
         sessionLocked := false
 }
 
-; Ctrl+Alt+M: append a "MARK | <project>" line. The importer can treat marks as
+; Ctrl+Alt+Insert: append a "MARK | <project>" line. The importer can treat marks as
 ; ground truth and attribute the segments that follow to that project.
-^!m:: {
+^!Insert:: {
     static lastProject := ""
     ib := InputBox("Bill time from now to project:", "Mark project", "w300 h110", lastProject)
     if (ib.Result != "OK" || Trim(ib.Value) = "")
