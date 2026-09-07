@@ -41,24 +41,39 @@ GetCurrentAppointmentCached() {
     return val
 }
 
+; RegRead() on this AutoHotkey build throws "(1630) Data of this type is not
+; supported" on REG_QWORD values, which LastUsedTimeStop/Start are — so plain
+; RegRead() silently (via the try/catch below) never finds a live mic user.
+; Read the QWORD via RegGetValueW instead.
+RegReadQWORD(subkey, valueName) {
+    static HKEY_CURRENT_USER := 0x80000001
+    static RRF_RT_QWORD := 0x48
+    buf := Buffer(8, 0)
+    size := 8
+    result := DllCall("advapi32\RegGetValueW", "ptr", HKEY_CURRENT_USER, "wstr", subkey, "wstr", valueName, "uint", RRF_RT_QWORD, "ptr", 0, "ptr", buf, "uint*", &size)
+    if (result != 0)
+        throw Error("RegGetValue failed: " result)
+    return NumGet(buf, 0, "int64")
+}
+
 ; Windows tracks live microphone use in the CapabilityAccessManager consent store:
 ; a subkey with LastUsedTimeStop = 0 means that app has the mic open right now.
 ; Returns the app using the mic ("ms-teams.exe", "MSTeams", ...) or "" if none.
 GetMicUserApp() {
-    static key := "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
-    Loop Reg, key "\NonPackaged", "K" {
+    static base := "SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone"
+    Loop Reg, "HKCU\" base "\NonPackaged", "K" {
         try {
-            if (RegRead(key "\NonPackaged\" A_LoopRegName, "LastUsedTimeStop") = 0) {
+            if (RegReadQWORD(base "\NonPackaged\" A_LoopRegName, "LastUsedTimeStop") = 0) {
                 SplitPath(StrReplace(A_LoopRegName, "#", "\"), &exe)
                 return exe
             }
         }
     }
-    Loop Reg, key, "K" {
+    Loop Reg, "HKCU\" base, "K" {
         if (A_LoopRegName = "NonPackaged")
             continue
         try {
-            if (RegRead(key "\" A_LoopRegName, "LastUsedTimeStop") = 0)
+            if (RegReadQWORD(base "\" A_LoopRegName, "LastUsedTimeStop") = 0)
                 return RegExReplace(A_LoopRegName, "_.*$")  ; strip the package-id suffix
         }
     }
