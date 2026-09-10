@@ -56,6 +56,27 @@ appends a line to a log file whenever it changes. Each line is one segment:
 - **Manual billing mark**: `Ctrl+Alt+Insert` prompts for a project name and
   appends a `MARK | <project>` line, so the importer can attribute
   subsequent segments to that project.
+- **Resilient log writes**: `LogSegment` retries `FileAppend` (5x, 200ms
+  apart) before giving up, and falls back to `window_log_<yyyy-MM>_failed.txt`
+  if the main log is still locked. See the fix below for why this matters.
+
+### Fixed: a locked log file could permanently wedge the tracker (2026-09-10)
+
+The log file lives on a OneDrive-synced Desktop, and OneDrive briefly locks
+a file mid-sync. `FileAppend` in `LogSegment` had no error handling, so a
+sharing-violation on one write threw an uncaught exception *before*
+`CheckWindow` updated `lastKey` — meaning every later tick kept trying (and
+failing) to log that same stale segment, and no new segment ever got
+recorded again. Observed 2026-09-10: tracking silently stopped for 90+
+minutes after one such error; the process was still running, just
+permanently stuck.
+
+Fixed with `AppendWithRetry` (retry + side-file fallback, see above) so a
+transient lock can no longer take down the tracker. Verified by holding an
+exclusive lock on the log file with a test script: the write no longer
+throws, falls back to the `_failed` file while locked, and resumes writing
+to the real log automatically once the lock is released — no restart
+needed.
 
 ### Fixed: `InCall` never fired (2026-09-07)
 

@@ -198,7 +198,25 @@ LogSegment(endTime := "") {
     durationMin := DateDiff(endTime, lastStartTime, "Seconds") // 60
     ; Title goes last: it may contain "|" itself, so importers should split on the first 4 pipes
     ; only. Detail is sanitized because it can now hold window titles (idle segments) too.
-    FileAppend(Format("{1} - {2} | {3:03} min | {4} | {5} | {6}`n", FormatTime(lastStartTime, "yyyy-MM-dd HH:mm:ss"), FormatTime(endTime, "yyyy-MM-dd HH:mm:ss"), durationMin, lastProcess, StrReplace(lastDetail, "|", "/"), lastTitle), CurrentLogFile(), "UTF-8")
+    line := Format("{1} - {2} | {3:03} min | {4} | {5} | {6}`n", FormatTime(lastStartTime, "yyyy-MM-dd HH:mm:ss"), FormatTime(endTime, "yyyy-MM-dd HH:mm:ss"), durationMin, lastProcess, StrReplace(lastDetail, "|", "/"), lastTitle)
+    AppendWithRetry(line, CurrentLogFile())
+}
+
+; OneDrive (the log lives on a synced Desktop) briefly locks the file mid-sync, which throws a
+; sharing-violation from FileAppend. Left uncaught, that aborts CheckWindow before it updates
+; lastKey, permanently wedging the tracker (happened 2026-09-10: 90+ min of silent dead air on
+; one such error). Retry briefly, and if the file is still locked, fall back to a side file
+; rather than crash — losing one line beats losing the rest of the day.
+AppendWithRetry(line, path) {
+    loop 5 {
+        try {
+            FileAppend(line, path, "UTF-8")
+            return
+        } catch {
+            Sleep(200)
+        }
+    }
+    try FileAppend(line, StrReplace(path, ".txt", "_failed.txt"), "UTF-8")
 }
 
 CheckWindow() {
