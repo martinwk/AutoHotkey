@@ -143,7 +143,7 @@ GetUIAProp(el, propId) {
     ComCall(10, el, "int", propId, "ptr", out)  ; GetCurrentPropertyValue
     vt := NumGet(out, 0, "ushort")
     val := ""
-    if (vt = 8)  ; VT_BSTR
+    if (vt = 8 && NumGet(out, 8, "ptr"))  ; VT_BSTR (can be a null pointer for empty names)
         val := StrGet(NumGet(out, 8, "ptr"))
     else if (vt = 11)  ; VT_BOOL
         val := NumGet(out, 8, "short") ? "true" : "false"

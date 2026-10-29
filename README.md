@@ -18,6 +18,27 @@ window/time tracker that logs activity for billing.
 - [lib/outlook_hotkeys.ahk](lib/outlook_hotkeys.ahk) — Outlook `Ctrl+D`
   delete-after-right-click helper. **Currently disabled** (commented out in
   `main.ahk`).
+- [lib/outlook_report_hotkeys.ahk](lib/outlook_report_hotkeys.ahk) — report
+  the selected mail through the ribbon's Report menu: `Alt+S` → Report Junk
+  (KeyTip `Alt,H,R1,J`), `Alt+P` → Report Phishing (`Alt,H,R1,P`). Only
+  active in classic Outlook's main window with a mail item selected (checked
+  via COM: `ActiveWindow` is an Explorer, selection is a `MailItem`, no inline
+  reply open), so not in calendar view or while composing a mail. The menu is
+  opened and the item clicked via UI Automation (dropdown by AutomationId
+  `ReportMenuButton_Dropdown`, item by its KeyTip), so it doesn't wait on
+  Office's KeyTip timing. If the Report button isn't in the UIA tree (ribbon
+  collapsed or another tab active) it falls back to sending the KeyTips; if
+  the menu has no such item it shows a tooltip.
+  - The COM mail check runs inside the hotkey, not in `#HotIf`: `#HotIf`
+    runs in the keyboard hook, where COM calls to Outlook fail with
+    `RPC_E_CANTCALLOUT_ININPUTSYNCCALL` (that caused a ping and no action).
+    When the check fails, the key is passed through to Outlook (Alt+S stays
+    Send in a compose window).
+  - **`ReportDryRun := true` (currently on)**: opens the menu and shows a
+    tooltip naming the item it would click, without reporting anything, on
+    every path including the KeyTip fallback. Set it to `false` to report
+    for real. `ReportDebugLog` logs every check to
+    `%TEMP%\outlook_report_hotkeys.log`.
 - [lib/utilities.ahk](lib/utilities.ahk) — shared helpers: exe path lookup
   (`FindExeLocations`, searches the folders listed in `paths.ini`),
   `ActivateOrRun`/`OnlyRun`, `CloseAllWindows`.
@@ -77,6 +98,12 @@ exclusive lock on the log file with a test script: the write no longer
 throws, falls back to the `_failed` file while locked, and resumes writing
 to the real log automatically once the lock is released — no restart
 needed.
+
+### Fixed: `GetUIAProp` crashed on elements without a name (2026-10-29)
+
+UIA returns a `VT_BSTR` with a null pointer for an empty Name, and
+`StrGet(0)` throws. `GetUIAProp` now checks the pointer first. Found while
+inspecting the Outlook ribbon; the same crash could also hit `GetBrowserURL`.
 
 ### Fixed: `InCall` never fired (2026-09-07)
 
