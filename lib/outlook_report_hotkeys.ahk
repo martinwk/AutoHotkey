@@ -6,7 +6,7 @@
 ; compose/reply window and not while replying inline in the reading pane.
 ; Testing aids: dry run opens the menu and shows what would be clicked without
 ; reporting anything; every check is logged to %TEMP%\outlook_report_hotkeys.log.
-global ReportDryRun := true
+global ReportDryRun := false
 global ReportDebugLog := true
 
 ReportLog(msg) {
@@ -41,8 +41,27 @@ ReportSelectedMail(key) {
         ComCall(6, uia, "ptr", WinActive("A"), "ptr*", &root)  ; ElementFromHandle
         dropdown := UIAFindFirst(uia, root, 30011, "ReportMenuButton_Dropdown")  ; AutomationId
         if !dropdown {
+            ; Another tab is open, so the Home buttons aren't in the tree: select Home.
+            if (home := UIAFindFirst(uia, root, 30011, "TabMail")) {
+                tabSel := 0
+                try {
+                    ComCall(16, home, "int", 10010, "ptr*", &tabSel)  ; GetCurrentPattern(SelectionItem)
+                    ComCall(3, tabSel)  ; Select
+                    Loop 40 {
+                        if (dropdown := UIAFindFirst(uia, root, 30011, "ReportMenuButton_Dropdown"))
+                            break
+                        Sleep(25)
+                    }
+                }
+                if (tabSel)
+                    ObjRelease(tabSel)
+                ObjRelease(home)
+                ReportLog("report " key ": selected Home tab, dropdown " (dropdown ? "found" : "still not found"))
+            }
+        }
+        if !dropdown {
             ReportLog("report " key ": dropdown not found in " WinGetTitle("A") ", sending KeyTips")
-            ; Ribbon collapsed or another tab open: the KeyTips switch to Home themselves.
+            ; Ribbon collapsed: the KeyTips switch to Home themselves.
             if ReportDryRun {
                 ToolTip("Dry run: Report button not found, would send KeyTips !hr1" key)
                 SetTimer(() => ToolTip(), -3000)
@@ -66,6 +85,7 @@ ReportSelectedMail(key) {
         } else if item {
             ComCall(16, item, "int", 10000, "ptr*", &invoker)  ; GetCurrentPattern(Invoke)
             ComCall(3, invoker)  ; Invoke
+            SetTimer(DismissReportThanks.Bind(A_TickCount), 100)
         } else {
             ComCall(4, expander)  ; Collapse
             ToolTip("Report menu has no '" key "' option for this mail")
@@ -74,6 +94,34 @@ ReportSelectedMail(key) {
     } catch as e
         ReportLog("report " key ": error " e.Message)
     for p in [invoker, item, expander, dropdown, root]
+        if (p)
+            ObjRelease(p)
+}
+
+; Timer: clicks OK on the "Thanks for reporting" dialog Outlook shows after a
+; report. Matches that title only, so a confirmation dialog is never answered.
+DismissReportThanks(started) {
+    static uia := ComObject("{FF48DBA4-60EF-4201-AA87-54103EEF594E}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")  ; CUIAutomation
+    hwnd := WinExist("Thanks for reporting ahk_class NUIDialog ahk_exe OUTLOOK.EXE")
+    if !hwnd {
+        if (A_TickCount - started > 10000) {
+            ReportLog("thanks dialog: not shown within 10 s")
+            SetTimer(, 0)
+        }
+        return
+    }
+    SetTimer(, 0)
+    root := 0, ok := 0, invoker := 0
+    try {
+        ComCall(6, uia, "ptr", hwnd, "ptr*", &root)  ; ElementFromHandle
+        if (ok := UIAFindFirst(uia, root, 30005, "OK")) {
+            ComCall(16, ok, "int", 10000, "ptr*", &invoker)  ; GetCurrentPattern(Invoke)
+            ComCall(3, invoker)  ; Invoke
+        }
+        ReportLog("thanks dialog: " (ok ? "clicked OK" : "OK button not found"))
+    } catch as e
+        ReportLog("thanks dialog: error " e.Message)
+    for p in [invoker, ok, root]
         if (p)
             ObjRelease(p)
 }

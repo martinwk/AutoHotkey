@@ -26,18 +26,21 @@ window/time tracker that logs activity for billing.
   reply open), so not in calendar view or while composing a mail. The menu is
   opened and the item clicked via UI Automation (dropdown by AutomationId
   `ReportMenuButton_Dropdown`, item by its KeyTip), so it doesn't wait on
-  Office's KeyTip timing. If the Report button isn't in the UIA tree (ribbon
-  collapsed or another tab active) it falls back to sending the KeyTips; if
-  the menu has no such item it shows a tooltip.
+  Office's KeyTip timing. If the Report button isn't in the UIA tree because
+  another ribbon tab is active, it selects the Home tab (AutomationId
+  `TabMail`) first; if the button is still missing (ribbon collapsed) it
+  falls back to sending the KeyTips. If the menu has no such item it shows a
+  tooltip. After a report it clicks OK on Outlook's "Thanks for reporting"
+  dialog (matched on that title only, so no confirmation dialog is ever
+  answered automatically).
   - The COM mail check runs inside the hotkey, not in `#HotIf`: `#HotIf`
     runs in the keyboard hook, where COM calls to Outlook fail with
     `RPC_E_CANTCALLOUT_ININPUTSYNCCALL` (that caused a ping and no action).
     When the check fails, the key is passed through to Outlook (Alt+S stays
     Send in a compose window).
-  - **`ReportDryRun := true` (currently on)**: opens the menu and shows a
+  - `ReportDryRun := true` (currently off): opens the menu and shows a
     tooltip naming the item it would click, without reporting anything, on
-    every path including the KeyTip fallback. Set it to `false` to report
-    for real. `ReportDebugLog` logs every check to
+    every path including the KeyTip fallback. Turn it on when testing. `ReportDebugLog` logs every check to
     `%TEMP%\outlook_report_hotkeys.log`.
 - [lib/utilities.ahk](lib/utilities.ahk) — shared helpers: exe path lookup
   (`FindExeLocations`, searches the folders listed in `paths.ini`),
