@@ -89,6 +89,7 @@ ExpandEnvVars(path) {
     result := StrReplace(result, "%PROGRAMFILES%", EnvGet("PROGRAMFILES"))
     result := StrReplace(result, "%PROGRAMFILES(X86)%", EnvGet("PROGRAMFILES(X86)"))
     result := StrReplace(result, "%APPDATA%", EnvGet("APPDATA"))
+    result := StrReplace(result, "%PROGRAMDATA%", EnvGet("PROGRAMDATA"))
     return result
 }
 

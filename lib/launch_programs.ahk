@@ -10,7 +10,6 @@ exeList := [
     "firefox.exe",
     "launchy.exe",
     "ms-teams.exe",
-    "Notion.exe",
     "POWERPNT.EXE",
     "Spotify.exe",
     "WINWORD.EXE",
@@ -19,6 +18,9 @@ exeList := [
 
 ; Find locations for all exe's
 locations := FindExeLocations(exeList)
+; Notion is a Store (MSIX) app under WindowsApps, which can't be searched or run
+; directly, so launch it via its AppUserModelID
+locations["Notion.exe"] := "shell:AppsFolder\com.notion.app.desktop.notion_87smfmv0eebam!com.notion.app.desktop.notion"
 ; for exe, path in locations
 ;     MsgBox(exe ": " path)
 
