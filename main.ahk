@@ -11,3 +11,4 @@
 ; #Include %A_AppData%\ahk\lib\outlook_hotkeys.ahk
 #Include %A_AppData%\ahk\lib\outlook_report_hotkeys.ahk
 #Include %A_AppData%\ahk\lib\word_table_hotkeys.ahk
+#Include %A_AppData%\ahk\lib\word_caption_hotkeys.ahk

@@ -51,6 +51,18 @@ window/time tracker that logs activity for billing.
   square brackets, it's a parameterized property); otherwise `` Ctrl+` `` is
   passed through to Word, where it's the grave-accent prefix (`` Ctrl+`, E ``
   = è). The follow-up keys are swallowed and time out after 2 s.
+- [lib/word_caption_hotkeys.ahk](lib/word_caption_hotkeys.ahk) — Word
+  `Ctrl+Shift+C`: Insert Caption when a picture/shape is selected
+  (`Selection.Type` 7/8), otherwise Insert Cross-reference. It only sends
+  keys; the dialogs come from Word key bindings in `Normal.dotm` (calling
+  `Dialogs().Show` over COM would block the script while the dialog is open).
+  Those bindings live in Word, not in this repo (File > Options > Customize
+  Ribbon > Keyboard shortcuts):
+  - `Ctrl+Shift+C` → `InsertCrossReference`
+  - `Ctrl+Alt+Shift+C` → `InsertCaption` (used by the script)
+  - `Ctrl+Shift+P` → `InsertPicture` (replaces Font Size)
+  - `Ctrl+Shift+T` → `TableInsertTable` (replaces Unhang)
+  - `Ctrl+Shift+F` → `InsertFootnote`
 - [lib/utilities.ahk](lib/utilities.ahk) — shared helpers: exe path lookup
   (`FindExeLocations`, searches the folders listed in `paths.ini`),
   `ActivateOrRun`/`OnlyRun`, `CloseAllWindows`.
