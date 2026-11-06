@@ -10,3 +10,4 @@
 #Include %A_AppData%\ahk\lib\track_window_log.ahk
 ; #Include %A_AppData%\ahk\lib\outlook_hotkeys.ahk
 #Include %A_AppData%\ahk\lib\outlook_report_hotkeys.ahk
+#Include %A_AppData%\ahk\lib\word_table_hotkeys.ahk

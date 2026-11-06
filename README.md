@@ -42,6 +42,15 @@ window/time tracker that logs activity for billing.
     tooltip naming the item it would click, without reporting anything, on
     every path including the KeyTip fallback. Turn it on when testing. `ReportDebugLog` logs every check to
     `%TEMP%\outlook_report_hotkeys.log`.
+- [lib/word_table_hotkeys.ahk](lib/word_table_hotkeys.ahk) — Word table
+  chords starting with `` Ctrl+` `` (Ctrl may stay held): `C` inserts a
+  column to the right, `R` a row below, `D, C` deletes the current
+  column(s), `D, R` the current row(s). Done via Word COM
+  (`Selection.InsertColumnsRight`, `InsertRowsBelow`, `Columns/Rows.Delete`).
+  Only when the cursor is in a table (`Selection.Information[12]`; note the
+  square brackets, it's a parameterized property); otherwise `` Ctrl+` `` is
+  passed through to Word, where it's the grave-accent prefix (`` Ctrl+`, E ``
+  = è). The follow-up keys are swallowed and time out after 2 s.
 - [lib/utilities.ahk](lib/utilities.ahk) — shared helpers: exe path lookup
   (`FindExeLocations`, searches the folders listed in `paths.ini`),
   `ActivateOrRun`/`OnlyRun`, `CloseAllWindows`.
