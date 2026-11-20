@@ -64,6 +64,21 @@ window/time tracker that logs activity for billing.
   `OutlookGrid`, checked in `#HotIf` without COM so typing elsewhere isn't
   slowed down) and exactly one `IPM.Schedule.Meeting.Request` is selected;
   otherwise the key goes through (`Ctrl+A` = select all, `Ctrl+D` = delete).
+  The same keys work in an open meeting window (title ends in
+  ` - Meeting`): on an opened request, and on the calendar item of a meeting
+  you were invited to (`MeetingStatus` = olMeetingReceived; there's no
+  request to delete then). The window is closed after responding, like
+  Outlook's own buttons do. A new meeting you're writing yourself has the
+  same title, so a 300 ms timer (`CheckMeetingWindow`) classifies each newly
+  active `- Meeting` window+title over COM in the background, and the keys
+  only act in windows classified as a received meeting. (Checking in the
+  hotkey itself dropped a/d keys typed while the COM call ran.) Outlook pads
+  inspector titles with trailing spaces, hence the `RTrim`.
+  - Declining (`D`) removes the appointment from the calendar right away,
+    even if you then close the response without sending it.
+  - A window left open while the item was answered elsewhere points to an
+    item that no longer exists; responding then fails with a tooltip
+    ("moved or deleted"). Reopen the item.
   `MeetingDryRun := true` shows a tooltip instead of responding.
   - Can't be tested end to end with an invite to yourself: Exchange moves
     a request sent to its own organizer straight to Deleted Items, and the
