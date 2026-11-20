@@ -33,6 +33,13 @@ From Git Bash: `"$LOCALAPPDATA/Programs/AutoHotkey/v2/AutoHotkey64.exe"`.
 
 ## Outlook COM (classic Outlook)
 
+- **Always ask before testing in Outlook yourself**, every time, even if
+  permission was given earlier in the session: the user may be working in
+  Outlook. Ask whether you may test it yourself or whether the user will
+  test it manually; in the latter case give a concrete list of what to test.
+  This covers anything that touches Outlook's UI (opening windows/drafts,
+  changing folder or selection, activating the window, sending keys).
+
 - `ComObjActive("Outlook.Application")` works from a test script while
   Outlook is running, so Outlook logic can be tested live.
 - The `Explorer` object has **no `HWND` property** (throws). To check whether

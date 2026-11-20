@@ -41,7 +41,33 @@ window/time tracker that logs activity for billing.
   - `ReportDryRun := true` (currently off): opens the menu and shows a
     tooltip naming the item it would click, without reporting anything, on
     every path including the KeyTip fallback. Turn it on when testing. `ReportDebugLog` logs every check to
-    `%TEMP%\outlook_report_hotkeys.log`.
+    `%TEMP%\outlook_report_hotkeys.log`, plus every report step with the
+    elapsed milliseconds.
+  - Timeout (`ReportTimeoutMs`, 10 s): a UIA call once hung for ~33 s. Once
+    the timeout passes, the report is aborted at the next step, before the
+    click or the KeyTip fallback, and the menu is collapsed. A tray
+    notification says that nothing was reported. A watchdog timer shows the
+    notification even while a call is still hanging, because COM pumps
+    messages while it waits. If the click itself is what hangs, the
+    notification asks you to check whether the mail was reported.
+- [lib/outlook_meeting_hotkeys.ahk](lib/outlook_meeting_hotkeys.ahk) —
+  respond to the selected meeting request in classic Outlook's mail list:
+  `A` accept and open the response to add a message (then Send yourself),
+  `Ctrl+A` accept and send right away, `D` decline with message, `Ctrl+D`
+  decline and send right away. Via Outlook COM
+  (`GetAssociatedAppointment(true).Respond(3|4, true)` then `.Display()` or
+  `.Send()`); afterwards the request is deleted from the Inbox, as Outlook's
+  own buttons do. With an edited response (`A`/`D`) that only happens once
+  the response is actually sent (`MeetingReplyWatcher` listens to the
+  response item's `Send` event via `ComObjConnect`), so closing it without
+  sending leaves the request in the Inbox. Only when the mail list itself has focus (focused control
+  `OutlookGrid`, checked in `#HotIf` without COM so typing elsewhere isn't
+  slowed down) and exactly one `IPM.Schedule.Meeting.Request` is selected;
+  otherwise the key goes through (`Ctrl+A` = select all, `Ctrl+D` = delete).
+  `MeetingDryRun := true` shows a tooltip instead of responding.
+  - Can't be tested end to end with an invite to yourself: Exchange moves
+    a request sent to its own organizer straight to Deleted Items, and the
+    organizer can't respond to it.
 - [lib/word_table_hotkeys.ahk](lib/word_table_hotkeys.ahk) — Word table
   chords starting with `` Ctrl+` `` (Ctrl may stay held): `C` inserts a
   column to the right, `R` a row below, `D, C` deletes the current
