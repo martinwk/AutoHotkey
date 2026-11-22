@@ -8,6 +8,7 @@
 #Include %A_AppData%\ahk\lib\utilities.ahk
 #Include %A_AppData%\ahk\lib\launch_programs.ahk
 #Include %A_AppData%\ahk\lib\track_window_log.ahk
+#Include %A_AppData%\ahk\lib\lid_sleep.ahk
 ; #Include %A_AppData%\ahk\lib\outlook_hotkeys.ahk
 #Include %A_AppData%\ahk\lib\outlook_report_hotkeys.ahk
 #Include %A_AppData%\ahk\lib\outlook_meeting_hotkeys.ahk

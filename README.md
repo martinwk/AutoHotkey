@@ -15,6 +15,8 @@ window/time tracker that logs activity for billing.
   windows), `Win+PrintScreen` → `Win+Shift+S`.
 - [lib/track_window_log.ahk](lib/track_window_log.ahk) — window/time tracker,
   see below.
+- [lib/lid_sleep.ahk](lib/lid_sleep.ahk) — closing the lid sleeps only when
+  no external display is in use, see below.
 - [lib/outlook_hotkeys.ahk](lib/outlook_hotkeys.ahk) — Outlook `Ctrl+D`
   delete-after-right-click helper. **Currently disabled** (commented out in
   `main.ahk`).
@@ -115,6 +117,44 @@ window/time tracker that logs activity for billing.
   per-user install), otherwise the Store (MSIX) app via its AppUserModelID
   (`shell:AppsFolder\com.notion.app.desktop.notion_…!…`), since Store apps
   under `WindowsApps` can't be searched or run directly.
+
+## Lid close (`lid_sleep.ahk`)
+
+Windows has a single lid-close action per power source and can't tell whether
+an external display is connected. The script keeps that setting (both AC and
+DC, in the active power plan) in sync with the display setup:
+
+- an external display is active (Extend, Duplicate or Second screen only) →
+  **Do nothing**, so the laptop keeps running closed;
+- only the laptop panel → **Sleep**.
+
+Windows then sleeps by itself. That matters because this laptop uses Modern
+Standby (S0 low power idle, no S3), where `SetSuspendState` would hibernate
+instead. "External" is any active display path (`QueryDisplayConfig`) whose
+output technology isn't an internal panel (internal / LVDS / eDP / UDI).
+
+- Re-synced at start-up, on `WM_DISPLAYCHANGE` (debounced 1.5 s), after resume,
+  and every 10 s as a backstop. **Changing the lid action by hand in Windows
+  Settings is undone within 10 s** while the script runs; when the script stops,
+  the last value stays.
+- Writing the setting works without admin rights.
+- Log: `%APPDATA%\ahk\lid_sleep.log` — lid open/close, display on/off,
+  suspend/resume and every change of the lid action, with the active outputs
+  and power source. Turn off with `LidDebugLog := false`.
+- Modern Standby doesn't send a suspend message, so the log has no
+  "systeem gaat in slaapstand" line for it. Instead, `beeldscherm uit (deksel
+  dicht: moderne stand-by)` right after `deksel dicht` shows it went to standby.
+  To confirm, look in Event Viewer → System → Kernel-Power: event 506 (entering
+  Modern Standby) and 507 (leaving it).
+- Unplugging the external display while the lid is already closed: Windows
+  only applies the lid action when the lid closes, and keeps the unplugged
+  display's path "active" (just marked unavailable), so nothing would happen.
+  The script counts only *available* external outputs, picks this up within
+  10 s, and starts standby itself by turning the display off
+  (`SC_MONITORPOWER`), which starts standby on Modern Standby. This happens
+  only while the display is on, so an external monitor that drops out after
+  an idle screen-off doesn't trigger it, and at most once until the lid
+  opens again.
 
 ## Window/time tracker (`track_window_log.ahk`)
 
