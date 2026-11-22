@@ -18,9 +18,12 @@ exeList := [
 
 ; Find locations for all exe's
 locations := FindExeLocations(exeList)
-; Notion is a Store (MSIX) app under WindowsApps, which can't be searched or run
-; directly, so launch it via its AppUserModelID
-locations["Notion.exe"] := "shell:AppsFolder\com.notion.app.desktop.notion_87smfmv0eebam!com.notion.app.desktop.notion"
+; Notion is installed differently per laptop: either as a regular per-user
+; install, or as a Store (MSIX) app under WindowsApps, which can't be searched
+; or run directly and is therefore launched via its AppUserModelID
+notionExe := EnvGet("LOCALAPPDATA") . "\Programs\Notion\Notion.exe"
+locations["Notion.exe"] := FileExist(notionExe) ? notionExe
+    : "shell:AppsFolder\com.notion.app.desktop.notion_87smfmv0eebam!com.notion.app.desktop.notion"
 ; for exe, path in locations
 ;     MsgBox(exe ": " path)
 

@@ -110,10 +110,11 @@ window/time tracker that logs activity for billing.
 - [paths.ini](paths.ini) — search roots used by `FindExeLocations` to locate
   the executables in `exeList` (in `launch_programs.ahk`). Environment
   variables (`%USERPROFILE%`, `%LOCALAPPDATA%`, `%PROGRAMDATA%`, …) are
-  expanded by `ExpandEnvVars`. Notion is a Store (MSIX) app under
-  `WindowsApps`, which can't be searched or run directly, so it isn't in
-  `exeList`: Win+N launches it via its AppUserModelID
-  (`shell:AppsFolder\com.notion.app.desktop.notion_…!…`).
+  expanded by `ExpandEnvVars`. Notion isn't in `exeList`: Win+N uses
+  `%LOCALAPPDATA%\Programs\Notion\Notion.exe` if that exists (regular
+  per-user install), otherwise the Store (MSIX) app via its AppUserModelID
+  (`shell:AppsFolder\com.notion.app.desktop.notion_…!…`), since Store apps
+  under `WindowsApps` can't be searched or run directly.
 
 ## Window/time tracker (`track_window_log.ahk`)
 
