@@ -4,11 +4,19 @@
 
 After successfully testing a change, and in any case before/with every commit, run `copy_ahk_to_startup.bat` to deploy the scripts to the startup folder. **Every commit requires this run, and it must be done from PowerShell or cmd (not Git Bash).** Changes to the `.ahk` files in `lib/` only take effect after this runs — editing the repo alone does not update the running scripts.
 
+- The repo is used on more than one laptop, with a different Windows user name
+  on each (e.g. `korevma`, `mwkor`). Never hard-code a user path; use
+  `$env:USERPROFILE` / `%USERPROFILE%` (or the actual repo root).
 - `copy_ahk_to_startup.bat` is not found by its bare name from PowerShell/cmd;
   call it by its full path. It ends with `pause`, so pipe input to it:
-  `'' | cmd /c "C:\Users\korevma\Repositories\AutoHotkey\copy_ahk_to_startup.bat"`
+  `'' | cmd /c "$env:USERPROFILE\Repositories\AutoHotkey\copy_ahk_to_startup.bat"`
 - Deploying only copies files. The running script (`main.ahk` in the Startup
-  folder) has to be reloaded to pick up the changes.
+  folder) has to be reloaded to pick up the changes: stop the running
+  `AutoHotkey64.exe` process for `main.ahk` and start it again with the
+  executable found below.
+- The deployed copy can lag far behind the repo on a laptop that hasn't been
+  deployed in a while. Check first (`diff` the Startup `main.ahk` against the
+  repo's) and tell the user which scripts a deploy would newly activate.
 
 ## Documentation
 
@@ -16,13 +24,23 @@ Before every commit, update [README.md](README.md) to reflect the changes in tha
 
 ## AutoHotkey executable
 
-AutoHotkey v2 is installed **per-user**, not in Program Files:
+Where AutoHotkey v2 is installed differs per laptop. Use the first one that
+exists:
 
 ```text
-%LOCALAPPDATA%\Programs\AutoHotkey\v2\AutoHotkey64.exe
+%LOCALAPPDATA%\Programs\AutoHotkey\v2\AutoHotkey64.exe   (per-user install)
+%ProgramFiles%\AutoHotkey\v2\AutoHotkey64.exe            (machine-wide install)
 ```
 
-From Git Bash: `"$LOCALAPPDATA/Programs/AutoHotkey/v2/AutoHotkey64.exe"`.
+From Git Bash:
+
+```sh
+AHK="$LOCALAPPDATA/Programs/AutoHotkey/v2/AutoHotkey64.exe"
+[ -f "$AHK" ] || AHK="$PROGRAMFILES/AutoHotkey/v2/AutoHotkey64.exe"
+```
+
+Or look at the path of the running process:
+`Get-Process AutoHotkey* | Select-Object Path`.
 
 - Syntax check without running: `AutoHotkey64.exe //ErrorStdOut //validate script.ahk`
   (double slashes in Git Bash, otherwise MSYS rewrites `/x` into a path).
